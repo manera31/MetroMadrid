@@ -10,10 +10,12 @@ import javax.swing.border.EmptyBorder;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.internal.ExceptionMapperStandardImpl;
 
 import models.*;
 
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
@@ -94,13 +96,16 @@ public class InsertLineaEstacion extends JFrame {
 					
 					TLineas linea = session.load(TLineas.class, Integer.valueOf(numLinea.getText()));
 					TEstaciones estaciones = session.load(TEstaciones.class, Integer.valueOf(numEstacion.getText()));
+					
 					TLineaEstacionId idLineaEstacion = new TLineaEstacionId(linea.getCodLinea(), estaciones.getCodEstacion());
 					TLineaEstacion lineaEstacion = new TLineaEstacion(idLineaEstacion, null, null, Integer.valueOf(numOrden.getText()));
 					try {
 						session.save(lineaEstacion);
 						transaction.commit();
+						JOptionPane.showMessageDialog(null, "Insertada");
 					} catch (Exception e) {
 						e.printStackTrace();
+						JOptionPane.showMessageDialog(null, "Error");
 					}
 				} else {
 				}

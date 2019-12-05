@@ -11,14 +11,17 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.internal.ExceptionMapperStandardImpl;
+import org.hibernate.query.Query;
 
 import models.*;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import javax.swing.WindowConstants;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 
 public class InsertLineaEstacion extends JFrame {
@@ -48,7 +51,7 @@ public class InsertLineaEstacion extends JFrame {
 	 * Create the frame.
 	 */
 	public InsertLineaEstacion() {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -89,26 +92,45 @@ public class InsertLineaEstacion extends JFrame {
 		JButton btnInsertar = new JButton("Insertar");
 		btnInsertar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				boolean coincide = false;
 				SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
 				Session session = sessionFactory.openSession();
 				Transaction transaction = session.beginTransaction();
-				if(Integer.valueOf(numLinea.getText()) > 0 && Integer.valueOf(numEstacion.getText()) > 0 && Integer.valueOf(numOrden.getText()) > 0  ) {
-					
-					TLineas linea = session.load(TLineas.class, Integer.valueOf(numLinea.getText()));
-					TEstaciones estaciones = session.load(TEstaciones.class, Integer.valueOf(numEstacion.getText()));
-					
-					TLineaEstacionId idLineaEstacion = new TLineaEstacionId(linea.getCodLinea(), estaciones.getCodEstacion());
-					TLineaEstacion lineaEstacion = new TLineaEstacion(idLineaEstacion, null, null, Integer.valueOf(numOrden.getText()));
-					try {
-						session.save(lineaEstacion);
-						transaction.commit();
-						JOptionPane.showMessageDialog(null, "Insertada");
-					} catch (Exception e) {
-						e.printStackTrace();
-						JOptionPane.showMessageDialog(null, "Error");
+				try {
+					String hql = "from TLineaEstacion where cod_linea = :id";
+					Query<TLineaEstacion> query = session.createQuery(hql);
+					query.setParameter("id", Integer.parseInt(numLinea.getText()));
+					ArrayList<TLineaEstacion> lineaEstacionAux = (ArrayList<TLineaEstacion>)query.list();
+
+					for(TLineaEstacion linea: lineaEstacionAux) {
+						System.out.println("Linea: "+ linea.getTLineas().getCodLinea() + ", orden: "+linea.getOrden());
+						if(Integer.parseInt(numOrden.getText()) == linea.getOrden()) {
+							coincide = true;
+							System.out.println("Entra");
+						}
 					}
-				} else {
+					if(!coincide) {
+						TLineas linea = session.load(TLineas.class, Integer.valueOf(numLinea.getText()));
+						TEstaciones estaciones = session.load(TEstaciones.class, Integer.valueOf(numEstacion.getText()));
+
+						TLineaEstacionId idLineaEstacion = new TLineaEstacionId(linea.getCodLinea(), estaciones.getCodEstacion());
+						TLineaEstacion lineaEstacion = new TLineaEstacion(idLineaEstacion, null, null, Integer.valueOf(numOrden.getText()));
+						try {
+							session.save(lineaEstacion);
+							transaction.commit();
+							JOptionPane.showMessageDialog(null, "Insertada");
+						} catch (Exception e) {
+							e.printStackTrace();
+							JOptionPane.showMessageDialog(null, "Error, no se puede repetir la clave primaria o las claves no existen");
+						}
+					} else {
+						JOptionPane.showMessageDialog(null, "No puede haber dos codLinea con la misma orden");
+					}
+				} catch (NumberFormatException nfe) {
+					JOptionPane.showMessageDialog(null, "Datos no validos");
+
 				}
+
 			}
 		});
 		btnInsertar.setBounds(289, 216, 114, 25);

@@ -11,6 +11,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
 import org.hibernate.Session;
@@ -24,13 +26,14 @@ public class ConsultaAccesos extends JFrame {
 
 	private JPanel contentPane;
 	private ArrayList<TAccesos> accesos;
-	private JLabel numAcceso;
+	private JTextField numAcceso;
 	private JLabel descripcion;
 	private JLabel numEstacion;
 	private JButton btnLanzarConsulta;
 	private JButton btnCancelarConsulta;
 	private JButton btnPrimer, btnUltimo, btnSiguiente, btnAnterior;
 	private int posicion = 0;
+	private JButton btnIr;
 
 	/**
 	 * Launch the application.
@@ -52,7 +55,7 @@ public class ConsultaAccesos extends JFrame {
 	 * Create the frame.
 	 */
 	public ConsultaAccesos() {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 536, 352);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -68,23 +71,23 @@ public class ConsultaAccesos extends JFrame {
 		contentPane.add(lblCodTren);
 		
 		JLabel lblNombre = new JLabel("DESCRIPCION");
-		lblNombre.setBounds(30, 130, 66, 15);
+		lblNombre.setBounds(30, 130, 100, 15);
 		contentPane.add(lblNombre);
 		
 		JLabel lblTipo = new JLabel("COD ESTACION");
-		lblTipo.setBounds(30, 160, 66, 15);
+		lblTipo.setBounds(30, 160, 100, 15);
 		contentPane.add(lblTipo);
 		
-		numAcceso = new JLabel("");
-		numAcceso.setBounds(188, 87, 66, 15);
+		numAcceso = new JTextField("");
+		numAcceso.setBounds(170, 100, 66, 20);
 		contentPane.add(numAcceso);
 		
 		descripcion = new JLabel("");
-		descripcion.setBounds(188, 117, 139, 15);
+		descripcion.setBounds(170, 130, 278, 15);
 		contentPane.add(descripcion);
 		
 		numEstacion = new JLabel("");
-		numEstacion.setBounds(188, 147, 139, 15);
+		numEstacion.setBounds(170, 160, 139, 15);
 		contentPane.add(numEstacion);
 		
 		//BOTONES
@@ -152,6 +155,9 @@ public class ConsultaAccesos extends JFrame {
 				btnAnterior.setEnabled(true);
 				btnPrimer.setEnabled(true);
 				btnUltimo.setEnabled(true);
+				btnIr.setEnabled(true);
+				llenarCampos(0);
+				session.close();
 			}
 		});
 		btnLanzarConsulta.setBounds(312, 0, 202, 25);
@@ -164,10 +170,31 @@ public class ConsultaAccesos extends JFrame {
 				btnAnterior.setEnabled(false);
 				btnPrimer.setEnabled(false);
 				btnUltimo.setEnabled(false);
+				btnIr.setEnabled(false);
 			}
 		});
 		btnCancelarConsulta.setBounds(312, 52, 202, 25);
 		contentPane.add(btnCancelarConsulta);
+		
+		btnIr = new JButton("IR");
+		btnIr.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				boolean aux = false;
+				for(int i = 0 ; i < accesos.size() ; i++) {
+					if(Integer.parseInt(numAcceso.getText()) == accesos.get(i).getCodAcceso()) {
+						llenarCampos(i);
+						posicion = i;
+						aux = true;
+					}
+				}
+				if(!aux) {
+					JOptionPane.showMessageDialog(null, "La ID no se ha encontrado");
+				}
+			}
+		});
+		btnIr.setEnabled(false);
+		btnIr.setBounds(248, 95, 47, 25);
+		contentPane.add(btnIr);
 	}
 	
 	private void llenarCampos(int posicion) {

@@ -12,6 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
 import org.hibernate.HibernateException;
@@ -28,10 +29,12 @@ public class ModificarEstaciones extends JFrame {
 	private ArrayList<TEstaciones> estaciones;
 	private JButton btnLanzarConsulta;
 	private JButton btnCancelarConsulta;
-	private JButton btnPrimer, btnUltimo, btnSiguiente, btnAnterior;
-	private JLabel codEstacion, nombre, direccion;
-	private JTextField numAccesos, numLineas, numViajesDestino, numViajesProcedencia;
+	private JButton btnPrimer, btnUltimo, btnSiguiente, btnAnterior, btnGuardar;
+	private JLabel nombre, direccion;
+	private JTextField numAccesos, numLineas, numViajesDestino, numViajesProcedencia, codEstacion;
 	private int posicion = 0;
+	private JButton btnIr;
+	private JLabel lblactualizarDespuesDe;
 
 	/**
 	 * Launch the application.
@@ -53,7 +56,7 @@ public class ModificarEstaciones extends JFrame {
 	 * Create the frame.
 	 */
 	public ModificarEstaciones() {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 536, 421);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -61,7 +64,7 @@ public class ModificarEstaciones extends JFrame {
 		contentPane.setLayout(null);
 		
 		JLabel lblConusltaTrenes = new JLabel("CONUSLTA ESTACIONES");
-		lblConusltaTrenes.setBounds(30, 40, 160, 15);
+		lblConusltaTrenes.setBounds(30, 40, 189, 15);
 		contentPane.add(lblConusltaTrenes);
 		
 		JLabel lblCodTren = new JLabel("COD ESTACION");
@@ -157,7 +160,11 @@ public class ModificarEstaciones extends JFrame {
 				btnAnterior.setEnabled(true);
 				btnPrimer.setEnabled(true);
 				btnUltimo.setEnabled(true);
+				btnGuardar.setEnabled(true);
+				btnIr.setEnabled(true);
 				session.close();
+				llenarCampos(0);
+				posicion = 0;
 			}
 		});
 		btnLanzarConsulta.setBounds(312, 0, 202, 25);
@@ -170,13 +177,15 @@ public class ModificarEstaciones extends JFrame {
 				btnAnterior.setEnabled(false);
 				btnPrimer.setEnabled(false);
 				btnUltimo.setEnabled(false);
+				btnGuardar.setEnabled(false);
+				btnIr.setEnabled(false);
 			}
 		});
 		btnCancelarConsulta.setBounds(312, 52, 202, 25);
 		contentPane.add(btnCancelarConsulta);
 		
-		codEstacion = new JLabel("");
-		codEstacion.setBounds(165, 100, 66, 15);
+		codEstacion = new JTextField("");
+		codEstacion.setBounds(165, 100, 66, 20);
 		contentPane.add(codEstacion);
 		
 		nombre = new JLabel("");
@@ -203,7 +212,7 @@ public class ModificarEstaciones extends JFrame {
 		numViajesProcedencia.setBounds(165, 280, 66, 15);
 		contentPane.add(numViajesProcedencia);
 		
-		JButton btnGuardar = new JButton("GUARDAR");
+		btnGuardar = new JButton("GUARDAR");
 		btnGuardar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
@@ -222,8 +231,33 @@ public class ModificarEstaciones extends JFrame {
 				}
 			}
 		});
+		btnGuardar.setEnabled(false);
 		btnGuardar.setBounds(371, 275, 114, 25);
 		contentPane.add(btnGuardar);
+		
+		btnIr = new JButton("IR");
+		btnIr.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				boolean aux = false;
+				for(int i = 0 ; i < estaciones.size() ; i++) {
+					if(Integer.parseInt(codEstacion.getText()) == estaciones.get(i).getCodEstacion()) {
+						llenarCampos(i);
+						posicion = i;
+						aux = true;
+					}
+				}
+				if(!aux) {
+					JOptionPane.showMessageDialog(null, "La ID no se ha encontrado");
+				}
+			}
+		});
+		btnIr.setEnabled(false);
+		btnIr.setBounds(233, 95, 47, 25);
+		contentPane.add(btnIr);
+		
+		lblactualizarDespuesDe = new JLabel("*Actualizar despues de guardar un dato");
+		lblactualizarDespuesDe.setBounds(30, 371, 335, 15);
+		contentPane.add(lblactualizarDespuesDe);
 	}
 	private void llenarCampos(int posicion) {
 		codEstacion.setText(String.valueOf(estaciones.get(posicion).getCodEstacion()));

@@ -17,6 +17,8 @@ import org.hibernate.query.Query;
 import javax.swing.JLabel;
 import javax.swing.JButton;
 import javax.swing.JTextField;
+import javax.swing.WindowConstants;
+
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.awt.event.ActionEvent;
@@ -25,14 +27,14 @@ public class ConsultaTrenes extends JFrame {
 
 	private JPanel contentPane;
 	private ArrayList<TTrenes> trenes;
-	private JLabel numTren;
+	private JTextField numTren;
 	private JLabel nombre;
 	private JLabel tipo;
 	private JLabel linea;
 	private JLabel cochera;
 	private JButton btnLanzarConsulta;
 	private JButton btnCancelarConsulta;
-	private JButton btnPrimer, btnUltimo, btnSiguiente, btnAnterior;
+	private JButton btnPrimer, btnUltimo, btnSiguiente, btnAnterior, btnIr;
 	private int posicion = 0;
 
 	/**
@@ -55,7 +57,7 @@ public class ConsultaTrenes extends JFrame {
 	 * Create the frame.
 	 */
 	public ConsultaTrenes() {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 536, 352);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -86,24 +88,24 @@ public class ConsultaTrenes extends JFrame {
 		lblCochera.setBounds(30, 220, 66, 15);
 		contentPane.add(lblCochera);
 		
-		numTren = new JLabel("");
-		numTren.setBounds(188, 87, 66, 15);
+		numTren = new JTextField("");
+		numTren.setBounds(188, 100, 66, 20);
 		contentPane.add(numTren);
 		
 		nombre = new JLabel("");
-		nombre.setBounds(188, 117, 139, 15);
+		nombre.setBounds(188, 130, 139, 15);
 		contentPane.add(nombre);
 		
 		tipo = new JLabel("");
-		tipo.setBounds(188, 147, 139, 15);
+		tipo.setBounds(188, 160, 139, 15);
 		contentPane.add(tipo);
 		
 		linea = new JLabel("");
-		linea.setBounds(188, 177, 66, 15);
+		linea.setBounds(188, 190, 66, 15);
 		contentPane.add(linea);
 		
 		cochera = new JLabel("");
-		cochera.setBounds(188, 207, 66, 15);
+		cochera.setBounds(188, 220, 66, 15);
 		contentPane.add(cochera);
 		
 		//BOTONES
@@ -171,6 +173,9 @@ public class ConsultaTrenes extends JFrame {
 				btnAnterior.setEnabled(true);
 				btnPrimer.setEnabled(true);
 				btnUltimo.setEnabled(true);
+				llenarCampos(0);
+				btnIr.setEnabled(true);
+				session.close();
 			}
 		});
 		btnLanzarConsulta.setBounds(312, 0, 202, 25);
@@ -183,10 +188,31 @@ public class ConsultaTrenes extends JFrame {
 				btnAnterior.setEnabled(false);
 				btnPrimer.setEnabled(false);
 				btnUltimo.setEnabled(false);
+				btnIr.setEnabled(false);
 			}
 		});
 		btnCancelarConsulta.setBounds(312, 52, 202, 25);
 		contentPane.add(btnCancelarConsulta);
+		
+		btnIr = new JButton("IR");
+		btnIr.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				boolean aux = false;
+				for(int i = 0 ; i < trenes.size() ; i++) {
+					if(Integer.parseInt(numTren.getText()) == trenes.get(i).getCodTren()) {
+						llenarCampos(i);
+						posicion = i;
+						aux = true;
+					}
+				}
+				if(!aux) {
+					JOptionPane.showMessageDialog(null, "La ID no se ha encontrado");
+				}
+			}
+		});
+		btnIr.setEnabled(false);
+		btnIr.setBounds(248, 95, 47, 25);
+		contentPane.add(btnIr);
 	}
 	
 	private void llenarCampos(int posicion) {
